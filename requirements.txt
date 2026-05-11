@@ -45,12 +45,11 @@ nltk==3.9.1
 numpy==2.3.3
 openai==2.8.0
 packaging==25.0
-pandas==2.3.2
+pandas
 pefile==2024.8.26
 pillow==11.3.0
 proto-plus==1.26.1
 protobuf==5.29.5
-pyarrow==21.0.0
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pydantic==2.12.4
