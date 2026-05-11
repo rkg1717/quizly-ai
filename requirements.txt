@@ -43,7 +43,7 @@ MarkupSafe==3.0.2
 narwhals==2.4.0
 nltk==3.9.1
 numpy==2.3.3
-openai==2.8.0
+openai
 packaging==25.0
 pandas
 pefile==2024.8.26
