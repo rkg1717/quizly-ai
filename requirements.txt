@@ -56,7 +56,6 @@ pydantic==2.12.4
 pydantic_core==2.41.5
 pydeck==0.9.1
 pydub
-pyaudioop-compat
 pyinstaller==6.17.0
 pyinstaller-hooks-contrib==2025.10
 pyparsing==3.2.5
