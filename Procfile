@@ -1,0 +1,1 @@
+web: gunicorn quizly.ai:app
