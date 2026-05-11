@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Results</title>
+  <style>
+    @media (max-width: 600px) {
+      body {
+        margin: 20px !important;
+        padding: 0 12px !important;
+      }
+      h1 {
+        font-size: 2.5rem !important;
+        margin: 16px 0 !important;
+      }
+      h2 {
+        font-size: 2.2rem !important;
+        margin: 16px 0 !important;
+      }
+      li {
+        font-size: 1.8rem !important;
+        margin-bottom: 12px !important;
+      }
+      .button {
+        font-size: 1.6rem !important;
+        padding: 14px 20px !important;
+        margin-top: 16px !important;
+        min-height: 52px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .button-row {
+        margin-top: 24px !important;
+      }
+      .button-row form {
+        display: block !important;
+        margin-right: 0 !important;
+        margin-bottom: 12px !important;
+      }
+    }
+    @media (max-width: 500px) {
+      body {
+        margin: 16px !important;
+      }
+      h1 {
+        font-size: 2.2rem !important;
+      }
+      h2 {
+        font-size: 2rem !important;
+      }
+      li {
+        font-size: 1.6rem !important;
+      }
+      .button {
+        font-size: 1.5rem !important;
+        padding: 12px 18px !important;
+        min-height: 50px !important;
+      }
+    }
+    @media (max-width: 380px) {
+      body {
+        margin: 12px !important;
+        padding: 0 8px !important;
+      }
+      h1 {
+        font-size: 1.8rem !important;
+      }
+      h2 {
+        font-size: 1.6rem !important;
+      }
+      li {
+        font-size: 1.4rem !important;
+        margin-bottom: 10px !important;
+      }
+      .button {
+        font-size: 1.3rem !important;
+        padding: 10px 16px !important;
+        min-height: 48px !important;
+      }
+      .button-row {
+        margin-top: 20px !important;
+      }
+    }
+  </style>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 40px; color: #333;">
+  <h1 style="color: #333; margin: 0; padding: 0; font-family: Arial, sans-serif;">Final Scores</h1>
+  {% if winner %}
+    <h2 style="margin: 0; padding: 0; font-family: Arial, sans-serif; color: #333;">🏆 {{ winner }} wins the game!</h2>
+  {% endif %}
+  <ul style="list-style-type: none; padding: 0; margin: 0;">
+    {% for team, score in scores.items() %}
+      <li class="{% if team == winner %}winner{% endif %}" style="margin-bottom: 10px; font-size: 18px; {% if team == winner %}font-weight: bold; color: green;{% else %}color: #333;{% endif %}">
+        {{ team }}: {{ "%.1f"|format(score) }} points
+      </li>
+    {% endfor %}
+  </ul>
+  <div class="button-row" style="margin-top: 30px;">
+    <form method="get" action="{{ url_for('restart_game') }}" style="display: inline-block; margin-right: 10px;">
+      <button class="button" style="margin-top: 20px; padding: 10px 20px; font-size: 16px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">Start Over</button>
+    </form>
+    <form method="get" action="{{ url_for('end_game') }}" style="display: inline-block; margin-right: 10px;">
+      <button class="button" style="margin-top: 20px; padding: 10px 20px; font-size: 16px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">End Game</button>
+    </form>
+  </div>
+</body>
+</html>

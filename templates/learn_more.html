@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn More</title>
+<style>
+@media (max-width: 600px) {
+body { margin: 1rem !important; font-size: 1.2rem !important; }
+.response { margin-top: 1rem !important; padding: 1rem !important; }
+.response p { font-size: 1.2rem !important; line-height: 1.6 !important; }
+p { font-size: 1.2rem !important; }
+button { font-size: 1.2rem !important; display: inline-block !important; padding: 10px 12px !important; background-color: #3498db !important; color: white !important; border-radius: 4px !important; margin-top: 1rem !important; border: none !important; cursor: pointer !important; }
+button:hover { background-color: #2980b9 !important; }
+}
+@media (max-width: 500px) {
+body { margin: 1rem !important; font-size: 1.3rem !important; }
+.response { margin-top: 1rem !important; padding: 1rem !important; }
+.response p { font-size: 1.3rem !important; line-height: 1.6 !important; }
+p { font-size: 1.3rem !important; }
+button { font-size: 1.3rem !important; display: block !important; padding: 12px 14px !important; background-color: #3498db !important; color: white !important; border-radius: 4px !important; margin-top: 1rem !important; width: 100% !important; text-align: center !important; box-sizing: border-box !important; border: none !important; cursor: pointer !important; }
+button:hover { background-color: #2980b9 !important; }
+}
+@media (max-width: 380px) {
+body { margin: 0.8rem !important; font-size: 1.2rem !important; }
+.response { margin-top: 0.8rem !important; padding: 0.8rem !important; }
+.response p { font-size: 1.2rem !important; }
+p { font-size: 1.2rem !important; }
+button { font-size: 1.2rem !important; padding: 10px 12px !important; margin-top: 0.8rem !important; border: none !important; cursor: pointer !important; }
+}
+</style>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 2rem; padding-bottom: 80px; line-height: 1.6; color: #333;">
+<div class="response" style="margin-top: 1rem; padding: 1rem; background-color: #f9f9f9; border-left: 4px solid #3498db;">
+<p style="margin: 0; font-size: 1rem; line-height: 1.6; color: #333;">{{ explanation }}</p>
+</div>
+<p style="margin: 0; padding: 0; line-height: 1.6; color: #333; font-size: 1rem;">
+<form method="post" action="{{ url_for('next_turn') }}" style="display: inline;">
+<button type="submit" style="color: blue; text-decoration: none; font-weight: bold;">Back to Game</button>
+</form>
+</p>
+</body>
+</html>

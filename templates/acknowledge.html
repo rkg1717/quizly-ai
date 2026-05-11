@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="refresh" content="1;url={{ url_for('game') }}">
+  <title>Acknowledgement</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    @media (max-width: 600px) {
+      .acknowledge-container {
+        padding: 16px !important;
+        margin: 16px auto !important;
+      }
+      .flash-messages {
+        padding: 20px !important;
+        margin: 16px auto !important;
+        font-size: 1.5rem !important;
+        border-radius: 6px !important;
+      }
+      .flash-messages p {
+        font-size: 1.5rem !important;
+        margin: 12px 0 !important;
+        line-height: 1.5 !important;
+        font-weight: bold !important;
+      }
+      .hint-text {
+        font-size: 1.25rem !important;
+        margin-top: 24px !important;
+        font-weight: 500 !important;
+      }
+    }
+    @media (max-width: 500px) {
+      .acknowledge-container {
+        padding: 16px !important;
+        margin: 16px auto !important;
+      }
+      .flash-messages {
+        padding: 18px !important;
+        margin: 16px auto !important;
+        font-size: 1.3rem !important;
+        border-radius: 6px !important;
+      }
+      .flash-messages p {
+        font-size: 1.3rem !important;
+        margin: 12px 0 !important;
+        line-height: 1.3 !important;
+        font-weight: bold !important;
+      }
+      .hint-text {
+        font-size: 1.2rem !important;
+        margin-top: 24px !important;
+        font-weight: 500 !important;
+      }
+    }
+    @media (max-width: 380px) {
+      .acknowledge-container {
+        padding: 12px !important;
+        margin: 12px auto !important;
+      }
+      .flash-messages {
+        padding: 16px !important;
+        margin: 12px auto !important;
+        font-size: 1.1rem !important;
+      }
+      .flash-messages p {
+        font-size: 1.1rem !important;
+        margin: 10px 0 !important;
+      }
+      .hint-text {
+        font-size: 1rem !important;
+        margin-top: 20px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="acknowledge-container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="font-size: 1rem; font-weight: bold;">No updates this turn.</p>
+      {% endif %}
+    {% endwith %}
+    <p class="hint-text">Loading next question…</p>
+  </div>
+</body>
+</html>

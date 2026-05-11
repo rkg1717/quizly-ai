@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Goldstein Games Hub{% endblock %}
+
+{% block content %}
+<style>
+    /* This shrinks the entire content area by 25% and pulls it to the top */
+    .overall-scale-container {
+        transform: scale(0.80);
+        transform-origin: top center; /* Ensures it shrinks toward the top, not the middle */
+        margin-top: -15px; /* Forcefully removes the top white space */
+    }
+
+    .hub-container {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 10px;
+    }
+
+    .game-card {
+        background: #1e293b;
+        border: 2px solid #38bdf8;
+        border-radius: 12px;
+        padding: 10px;
+        width: 280px; 
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: white;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+
+    .game-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: contain;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    h2 { color: #38bdf8; margin: 5px 0; font-weight: 800; font-size: 1.3rem; }
+    p.card-text { color: #94a3b8; font-size: 0.9rem; line-height: 1.3; }
+</style>
+
+<div class="overall-scale-container">
+    <div style="text-align: center; padding-top: 0;">
+        <h1 style="color: #38bdf8; font-size: 1.5rem; margin-bottom: 5px; line-height: 1.2;">
+            WELCOME TO THE AI-BASED GAME HUB <br> INTENDED TO HELP EDUCATE OR SIMPLY HAVE FUN
+        </h1>
+        <p style="color: #475569; font-size: 1.4rem; margin-bottom: 5px;">
+            Select Either 'FixIt' or 'Music Recall' to begin. 
+            <br> <small style="font-size:  font-style: italic; 1rem;"><b>Note: AI generated content is not always perfect.</b></small>
+        </p>
+    </div>
+
+    <div class="hub-container">
+        <a href="/fixit_intro" class="game-card">
+            <img src="{{ url_for('static', filename='fixit_thumb.png') }}" class="game-image" alt="FixIt Game">
+            <h2>FIXIT</h2>
+            <p class="card-text">Master the art of home maintenance. Repair, rewire, and resolve!</p>
+        </a>
+
+        <a href="/music_recall" class="game-card">
+            <img src="{{ url_for('static', filename='music_thumb.png') }}" class="game-image" alt="Music Recall">
+            <h2>MUSIC RECALL</h2>
+            <p class="card-text">Identify legendary tracks. From Benny Goodman to the latest Country and Jazz.</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

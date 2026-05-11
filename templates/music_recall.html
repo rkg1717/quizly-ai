@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Recall // Pro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        :root {
+            --slate: #1e293b;
+            --cobalt: #38bdf8;
+            --glass: rgba(255, 255, 255, 0.05);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body { 
+            background-color: #0f172a; 
+            color: var(--text-main); 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container { 
+            max-width: 600px; 
+            width: 90%;
+            border: 1px solid rgba(255,255,255,0.1); 
+            background: var(--slate); 
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Genre Navigation */
+        .genre-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .genre-link {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: 0.3s;
+            padding-bottom: 5px;
+        }
+
+        .genre-link:hover { color: var(--cobalt); }
+        .genre-link.active { 
+            color: var(--cobalt); 
+            border-bottom: 2px solid var(--cobalt); 
+        }
+
+        /* Content Boxes */
+        .reveal-box {
+            background: var(--glass);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.4s ease;
+        }
+
+        .label { 
+            font-size: 0.7rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.15em; 
+            color: var(--cobalt); 
+            margin-bottom: 12px;
+            font-weight: 800;
+        }
+
+        .beat-text { 
+            font-family: 'Monaco', 'Courier New', monospace; 
+            font-size: 1.1rem; 
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+
+        /* Buttons */
+        .btn-primary { 
+            background: var(--cobalt); 
+            color: #0f172a; 
+            padding: 14px 24px; 
+            border-radius: 6px; 
+            font-weight: 700; 
+            border: none; 
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: transform 0.1s;
+        }
+
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { background: #475569; cursor: not-allowed; }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid #475569;
+            margin-top: 12px;
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-secondary:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+
+        .hidden { display: none; opacity: 0; }
+        
+        #answer-box { border-left: 4px solid var(--cobalt); background: rgba(56, 189, 248, 0.05); }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="margin-top: 0; font-weight: 800; letter-spacing: -0.02em;">Music Recall</h2>
+        
+		<div class="genre-nav">
+			<a href="#" class="genre-link active" onclick="setGenre(this, 'Country')">COUNTRY</a>
+			<a href="#" class="genre-link" onclick="setGenre(event, this, 'Rock')">ROCK</a>
+			<a href="#" class="genre-link" onclick="setGenre(event, this, 'Jazz')">JAZZ</a>
+			<a href="#" class="genre-link" onclick="setGenre(event, this, 'R&B')">R&B</a>
+			<a href="#" class="genre-link" onclick="setGenre(event, this, 'Latin')">LATIN</a>
+			<a href="#" class="genre-link" onclick="setGenre(event, this, 'Folk')">FOLK</a>
+			<a href="#" class="genre-link" onclick="setGenre(event, this, 'Pop')">POP</a>
+			<a href="#" class="genre-link" onclick="setGenre(event, this, 'Hip-Hop')">HIP-HOP</a>
+			<a href="#" class="genre-link" onclick="setGenre(event, this, 'Classical')">CLASSICAL</a>
+
+		</div>
+
+		<div id="game-board">
+			<div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: 800;">
+				<span style="color: var(--text-dim);">SCORE: <span id="player-score" style="color: var(--cobalt);">0</span></span>
+				<span style="color: var(--text-dim);">STREAK: <span id="player-streak" style="color: #10b981;">0</span></span>
+			</div>
+
+			<div class="reveal-box">
+				<div class="label">Rhythmic Signature</div>
+				<div id="beat-display" class="beat-text">ANALYZING...</div>
+			</div>
+
+			<div id="guess-section" class="reveal-box" style="background: rgba(255,255,255,0.1); border: 1px solid var(--cobalt); padding: 15px;">
+				<div class="label">Your Guess (Artist or Song)</div>
+				<div style="display: flex; gap: 10px; align-items: center;">
+					<input type="text" id="user-guess" placeholder="Type here..." 
+						   style="flex-grow: 1; background: transparent; border: none; color: white; font-size: 1.1rem; outline: none;">
+					<button id="submit-btn" onclick="checkGuess()" 
+							style="background: #10b981; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 0.8rem;">
+						SUBMIT
+					</button>
+				</div>
+			</div>
+
+			<div id="feedback-text" style="font-weight: 800; text-align: center; margin-bottom: 15px; font-size: 1.2rem; min-height: 1.5em;"></div>
+
+			<div id="stage-2" class="reveal-box hidden">
+				<div class="label">The Lowdown</div>
+				<div id="lowdown-display"></div>
+			</div>
+
+			<div id="stage-3" class="reveal-box hidden">
+				<div class="label">Lyric Fragment (or lead instrument)</div>
+				<div id="lyric-display" style="font-size: 1.1rem; font-style: italic;"></div>
+			</div>
+
+			<div id="answer-box" class="reveal-box hidden">
+				<div class="label">Identity Confirmed</div>
+				<div id="song-answer" style="font-size: 1.4rem; font-weight: 800;"></div>
+				<div id="artist-details" style="color: var(--text-dim);"></div>
+			</div>
+
+			<div style="margin-top: 20px; text-align: center;">
+				<button id="clue-btn" onclick="handleClueRequest()" class="btn-primary" style="display: block; margin: 0 auto 10px auto;">
+					NEED A CLUE (-50 pts)
+				</button>
+				<button id="reveal-btn" onclick="giveUp()" class="btn-secondary" style="display: none; border-color: #ef4444; color: #ef4444; margin-bottom: 10px;">
+					I GIVE UP (REVEAL ANSWER)
+				</button>
+
+				<button id="next-btn" onclick="loadNewSong()" class="btn-secondary" style="display: none; margin: 0 auto;">
+					NEXT TRACK
+				</button>
+				<div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center;">
+					<a href="/" style="color: white; text-decoration: none; font-size: 1rem; letter-spacing: 0.1em; font-weight: 700;">
+						CLICK HERE TO LEAVE 'MUSIC RECALL'
+					</a>
+				</div>
+			</div>
+		</div>
+    </div>
+<script>
+// --- GAME STATE ---
+    let currentStage = 1;
+    let selectedGenre = 'Country';
+    let score = 0;
+    let streak = 0;
+    let pointsPossible = 200; 
+    let currentSongData = {};
+
+    document.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            const guessInput = document.getElementById('user-guess');
+            if (document.activeElement === guessInput) {
+                checkGuess();
+            }
+        }
+    });
+
+	function setGenre(event, element, genre) {
+		// 1. Prevent the '#' from jumping the page to the top
+		if (event) event.preventDefault(); 
+		
+		console.log("Switching genre to: " + genre);
+
+		// 2. Move the 'active' highlight to the clicked link
+		document.querySelectorAll('.genre-link').forEach(el => el.classList.remove('active'));
+		element.classList.add('active');
+
+		// 3. Update the global variable
+		selectedGenre = genre;
+
+		// 4. Trigger a fresh song load with the new genre
+		loadNewSong();
+	}
+
+    async function loadNewSong() {
+        currentStage = 1;
+        pointsPossible = 200;
+        
+        document.getElementById('user-guess').value = "";
+        document.getElementById('submit-btn').disabled = false;
+        document.getElementById('feedback-text').innerText = "";
+
+		document.getElementById('reveal-btn').style.display = "block"; // Show the Give Up button
+		document.getElementById('next-btn').style.display = "none";    // Hide Next Track until end
+
+        const clueBtn = document.getElementById('clue-btn');
+        clueBtn.style.display = "block";
+        clueBtn.disabled = false;
+        clueBtn.style.opacity = "1";
+        clueBtn.innerText = "NEED A CLUE (-50 pts)";
+        
+        document.getElementById('next-btn').style.display = "none";
+
+        // --- CHANGE C GOES HERE ---
+        // Hide the "Give Up" button when starting a fresh song
+        const revealBtn = document.getElementById('reveal-btn');
+        if (revealBtn) revealBtn.style.display = "none";
+        
+        document.getElementById('stage-2').classList.add('hidden');
+        document.getElementById('stage-3').classList.add('hidden');
+        document.getElementById('answer-box').classList.add('hidden');
+        
+        document.getElementById('beat-display').innerText = "ANALYZING SIGNATURE...";
+
+        try {
+            const response = await fetch('/get_music_turn', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({genre: selectedGenre}) 
+            });
+            
+            currentSongData = await response.json();
+            
+            document.getElementById('beat-display').innerText = currentSongData.Beat;
+            document.getElementById('lowdown-display').innerText = currentSongData.Lowdown;
+            document.getElementById('lyric-display').innerText = `"${currentSongData.Lyric}"`;
+            document.getElementById('song-answer').innerText = currentSongData.Song;
+            document.getElementById('artist-details').innerText = `${currentSongData.Artist} (${currentSongData.Year})`;
+
+        } catch (error) {
+            console.error("Fetch error:", error);
+            document.getElementById('beat-display').innerText = "CONNECTION INTERRUPTED.";
+        }
+    }
+
+function handleClueRequest() {
+    if (currentStage >= 4) return;
+
+    currentStage++;
+    pointsPossible -= 50; 
+    const clueBtn = document.getElementById('clue-btn');
+
+    if (currentStage === 2) {
+        // Reveals Lowdown
+        document.getElementById('stage-2').classList.remove('hidden');
+        document.getElementById('stage-2').style.opacity = 1;
+        clueBtn.innerText = "NEED ANOTHER CLUE? (-50 pts)";
+    } 
+    else if (currentStage === 3) {
+        // Reveals Lyric Fragment
+        document.getElementById('stage-3').classList.remove('hidden');
+        document.getElementById('stage-3').style.opacity = 1;
+        clueBtn.innerText = "HEAR AUDIO SNIPPET? (-50 pts)";
+    }
+else if (currentStage === 4) {
+    if (currentSongData.Song && currentSongData.Artist) {
+        const song = encodeURIComponent(currentSongData.Song);
+        const artist = encodeURIComponent(currentSongData.Artist);
+        
+        // 1. Create the audio object
+        const audio = new Audio(`/get_audio_clue/${song}/${artist}`);
+        
+        // 2. Play the audio
+        audio.play().then(() => {
+            console.log("Audio clue started...");
+            
+            // 3. STOP the audio after 5 seconds (5000ms)
+            setTimeout(() => {
+				// Quick fade out
+				let fadeOut = setInterval(() => {
+					if (audio.volume > 0.1) {
+						audio.volume -= 0.1;
+					} else {
+						audio.pause();
+						clearInterval(fadeOut);
+					}
+				}, 100); // Lowers volume every 100ms
+			}, 4000); // Start fading at 4 seconds
+						
+        }).catch(e => console.log("Playback failed:", e));
+    }
+    
+    // UI Updates
+    clueBtn.innerText = "NO CLUES LEFT";
+    clueBtn.disabled = true;
+    clueBtn.style.opacity = "0.5";
+    document.getElementById('reveal-btn').style.display = "block";
+}
+}
+
+function checkGuess() {
+    let userGuess = document.getElementById('user-guess').value.toLowerCase().trim();
+    let correctSong = currentSongData.Song.toLowerCase();
+    let correctArtist = currentSongData.Artist.toLowerCase();
+    const feedback = document.getElementById('feedback-text');
+
+    // Ignore very short accidental entries
+    if (userGuess.length < 2) return;
+
+    // --- SUPER NORMALIZATION ---
+    // Converts 5 to five, removes spaces/dashes, and makes everything lowercase
+    const superClean = (str) => {
+        if (!str) return "";
+        return str.toLowerCase()
+                  .replace(/\b1\b/g, 'one')
+                  .replace(/\b2\b/g, 'two')
+                  .replace(/\b3\b/g, 'three')
+                  .replace(/\b4\b/g, 'four')
+                  .replace(/\b5\b/g, 'five')
+                  .replace(/\b6\b/g, 'six')
+                  .replace(/\b7\b/g, 'seven')
+                  .replace(/\b8\b/g, 'eight')
+                  .replace(/\b9\b/g, 'nine')
+                  .replace(/\b0\b/g, 'zero')
+                  .replace(/[^a-z0-9]/g, '') // Removes spaces, quotes, and punctuation
+                  .trim();
+    };
+
+    const cleanUser = superClean(userGuess);
+    const cleanSong = superClean(correctSong);
+    const cleanArtist = superClean(correctArtist);
+
+    // Compare cleaned versions: does the guess match the song or the artist?
+    const isCorrect = cleanUser.includes(cleanSong) || 
+                      cleanSong.includes(cleanUser) || 
+                      cleanUser.includes(cleanArtist);
+
+    if (isCorrect) {
+        score += pointsPossible;
+        streak++;
+        feedback.innerText = `✅ CORRECT! +${pointsPossible} PTS`;
+        feedback.style.color = "#10b981";
+        
+        showFullReveal();
+        
+        // UI Updates for a win
+        document.getElementById('clue-btn').style.display = "none";
+        document.getElementById('reveal-btn').style.display = "none";
+        document.getElementById('next-btn').style.display = "block";
+    } else {
+        feedback.innerText = "❌ NOPE. TRY AGAIN OR TAKE A CLUE.";
+        feedback.style.color = "#ef4444";
+    }
+
+    // Refresh displays
+    document.getElementById('player-score').innerText = score;
+    document.getElementById('player-streak').innerText = streak;
+}
+	function giveUp() {
+        // 1. Reveal all hidden clues and the answer
+        showFullReveal();
+        
+        // 2. Update feedback (Fixed with quotes to prevent hanging)
+        const feedback = document.getElementById('feedback-text');
+        feedback.innerText = "MISSION ABORTED. ANSWER REVEALED.";
+        feedback.style.color = "#94a3b8"; 
+        
+        // 3. Reset streak and swap buttons
+        streak = 0;
+        document.getElementById('player-streak').innerText = streak;
+        document.getElementById('clue-btn').style.display = "none";
+        document.getElementById('reveal-btn').style.display = "none";
+        document.getElementById('next-btn').style.display = "block";
+    }	
+    function showFullReveal() {
+        document.getElementById('stage-2').classList.remove('hidden');
+        document.getElementById('stage-3').classList.remove('hidden');
+        document.getElementById('answer-box').classList.remove('hidden');
+        document.getElementById('stage-2').style.opacity = 1;
+        document.getElementById('stage-3').style.opacity = 1;
+        document.getElementById('answer-box').style.opacity = 1;
+        
+        document.getElementById('submit-btn').disabled = true;
+    }
+
+    window.onload = loadNewSong;
+</script>
+</body>
+</html>
