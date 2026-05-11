@@ -1,0 +1,108 @@
+{
+  "electrical": {
+    "outlets": ["test", "voltage"],
+    "switches": ["replace", "types"],
+    "wiring": ["new"],
+    "fuses": ["tripped", "amps"],
+    "surge protectors": ["use", "types"],
+    "extension cords": ["safety"],
+    "lighting": ["light fixtures", "low voltage"],
+    "circuits": ["testing", "new"],
+    "safety": ["ground fault", "circuits"],
+    "measurements": ["electricity"],
+	"outage": ["backup"]
+  },
+  "services": {
+    "WIFI": ["equipment", "ISP", "downloads"],
+    "streaming": ["setup", "problems"],
+    "phone carriers": ["service", "speed"],
+    "cell phone": ["devices", "charging"],
+    "county": ["utilities", "gas", "electrict", "propane", "water"],
+	"online": ["shopping", "scams"]
+  },
+  "plumbing": {
+    "water": ["lines", "faucet"],
+    "toilet": ["problems", "leaks"],
+    "sinks": ["faucet", "leaks"],
+    "showers": ["faucet", "drain"],
+    "water heater": ["hot water", "maintenance"],
+	"drains": ["clogged"]
+  },
+  "yard": {
+    "lawn": ["new and existing", "moles and voles"],
+    "shrubs": ["new", "existing", "fertilizing"],
+    "trees": ["fruit", "deciduous"],
+    "flowers": ["planting", "care"],
+    "vegetables": ["planting", "care"],
+    "pests": ["good", "bad", "insects"],
+    "weeds": ["removal", "prevention"],
+    "landscaping": ["design"]
+  },
+  "tools": {
+    "garden": ["equipment"],
+    "wood working": ["cutting"],
+    "hand": ["wood working"],
+    "power": ["types", "use", "safety"],
+    "automotive": ["repairs"]
+  },
+    "recreation": {
+	"kayaks": ["safety", "storage", "maintenance"],
+    "power boats": ["safety", "engine", "hull", "bimini", "decks", "gelcoat", "head", "bottom", "GPS", "VHS", "Chart plotter"],
+    "sail boats": ["safety", "engine", "hull", "bimini", "sails", "rigging", "decks", "gelcoat", "head", "bottom", "GPS", "VHS", "chart plotter"],
+    "bicycles": ["safety", "adjustments","maintenance", "tires", "breaks"]
+  },
+  "interior": {
+    "walls": ["material"],
+    "painting": ["paints", "technique"],
+    "windows": ["type", "cleaning", "screens"],
+    "doors": ["types", "handles", "locks"],
+    "floors": ["care", "refinishing"],
+    "stairs": ["safety"],
+    "floor coverings": ["carpets", "tiles", "rugs"],
+    "cellar": ["issues"],
+    "crawl space": ["issues"],
+    "attic": ["space", "issues"],
+    "design": ["best practices"],
+    "window": ["coverings"],
+	"fireplace": ["safety"]
+  },
+  "exterior": {
+    "dry rot": ["paint"],
+    "roof": ["replacement"],
+	"brick": ["cleaning"],
+	"wood": ["repair", "cleaning"],
+	"driveway": ["cleaning", "repair"],
+	"gutters": ["cleaning"],
+	"chiminey": ["safety"],
+	"drainage": ["yard"],
+	"fences": ["types", "maintenance"],
+	"swimming pools": ["maintenance"]
+  },
+  "appliances": {
+    "dishwasher": ["issues", "care"],
+    "washing machine": ["issues", "care"],
+    "clothes dryer": ["issues", "care"],
+    "HVAC": ["issues", "care"],
+    "refrigerator": ["issues", "care"],
+    "kitchen": ["stove or ovens or microwave", "outlets"],
+	"small": ["cooking", "heating", "cooling", "entertainment"],
+    "outdoor": ["BBQ", "issues", "cleaning"]
+  },
+  "auto": {
+    "maintenance": ["oil change", "brakes", "rattles"],
+    "detailing": ["washing", "waxing", "apholstery"],
+    "tires": ["pressure", "tread", "ware", "flats"],
+	"windshield": ["wipers", "cleaning", "crack", "scratch"],
+	"battery":  ["charge", "jumper cables", "dead"]
+  },
+  "cooking": {
+    "dinners": ["easy", "wine"],
+    "lunch": ["healthy"],
+    "breakfast": ["healthy"],
+    "desserts": ["easy", "diet"],
+    "allergies": ["awareness", "substitutions"],
+	"nutrician": ["daily needs"],
+	"snackes": ["nutricias"],
+	"food": ["diabetics"]
+  }
+  }
