@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixIt Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+      @keyframes popIn {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0.8);
+        }
+        100% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+
+      .options-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin: 20px auto;
+        max-width: 600px;
+      }
+
+      .option-label {
+        display: flex;
+        align-items: center;
+        padding: 14px;
+        background: #f0f8ff;
+        border: 2px solid #3498db;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1.05rem;
+      }
+
+      .option-label:hover {
+        background: #e8f4ff;
+        border-color: #2980b9;
+        transform: translateX(4px);
+      }
+
+      .option-label input[type="radio"] {
+        margin-right: 12px;
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+        accent-color: #3498db;
+      }
+
+      .yes-no-buttons {
+        display: flex;
+        gap: 12px;
+        margin: 20px auto;
+        max-width: 600px;
+        justify-content: center;
+      }
+
+      .yes-no-btn {
+        flex: 1;
+        padding: 16px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border: 2px solid #3498db;
+        border-radius: 6px;
+        cursor: pointer;
+        background: white;
+        color: #3498db;
+        transition: all 0.3s ease;
+      }
+
+      .yes-no-btn:hover {
+        background: #3498db;
+        color: white;
+        transform: scale(1.05);
+      }
+
+      .yes-no-btn.selected {
+        background: #3498db;
+        color: white;
+      }
+
+      @media (max-width: 600px) {
+        h2 {
+          font-size: 2rem !important;
+          margin: 12px 0 !important;
+        }
+        .game-container p {
+          font-size: 1.2rem !important;
+        }
+        .answer-form input {
+          font-size: 1.2rem !important;
+          padding: 14px !important;
+          min-height: 48px !important;
+        }
+        .answer-form button {
+          font-size: 1.3rem !important;
+          padding: 16px !important;
+          min-height: 52px !important;
+        }
+        .hint-text {
+          font-size: 1.1rem !important;
+        }
+        #char-count {
+          font-size: 1rem !important;
+        }
+        .answer-block {
+          padding: 14px !important;
+        }
+        .answer-block p {
+          font-size: 1.1rem !important;
+        }
+        .option-label {
+          font-size: 1rem !important;
+          padding: 12px !important;
+        }
+        .yes-no-btn {
+          font-size: 1.1rem !important;
+          padding: 14px !important;
+        }
+      }
+
+      @media (max-width: 500px) {
+        h2 {
+          font-size: 1.8rem !important;
+        }
+        #triviaBubble > div {
+          padding: 16px 20px !important;
+          max-width: 90vw !important;
+          border-radius: 14px !important;
+        }
+        #triviaContent {
+          font-size: 1rem !important;
+          line-height: 1.5 !important;
+        }
+      }
+
+      @media (max-width: 380px) {
+        h2 {
+          font-size: 1.6rem !important;
+        }
+        #triviaBubble > div {
+          padding: 14px 16px !important;
+          font-size: 0.95rem !important;
+        }
+      }
+    </style>
+</head>
+<body>
+
+    <div id="triviaBubble" style="display: none; position: fixed; bottom: 20px; right: 20px; transform: none; z-index: 2000; cursor: pointer;">
+      <div style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 20px 24px; border-radius: 16px; max-width: 400px; width: 85vw; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); position: relative; animation: popIn 0.4s ease;">
+        <span style="position: absolute; top: 8px; right: 12px; font-size: 1.2rem; opacity: 0.7;">✕</span>
+        <p id="triviaContent" style="margin: 0; font-size: 1.05rem; line-height: 1.6; font-weight: 500; text-align: center; padding-right: 20px;">Loading trivia...</p>
+        <p style="margin: 8px 0 0 0; font-size: 0.85rem; text-align: center; opacity: 0.8; font-style: italic;">(Click to close)</p>
+      </div>
+    </div>
+
+    <div class="game-container" style="max-width: 600px; margin: 20px auto; padding: 16px; text-align: center;">
+
+        <h2 style="margin: 16px 0; text-align: center; color: #2c3e50; font-family: 'Segoe UI', sans-serif;">Team: <span style="color: #e67e22;">{{ current_team }}</span></h2>
+
+        <p style="text-align: center; margin: 8px 0; font-size: 0.95rem; color: #333; line-height: 1.5;"><strong>Category:</strong> {{ category }}</p>
+
+        <div style="background-color: #f9f9f9; border-left: 4px solid #3498db; padding: 12px 16px; margin: 16px auto; border-radius: 6px; max-width: 600px;">
+            <p style="margin: 0; font-size: 1.2rem; line-height: 1.6; text-align: center; color: #333;"><strong>Question:</strong> {{ question }}</p>
+        </div>
+
+        <!-- MULTIPLE CHOICE QUESTIONS -->
+        {% if question_type == "multiple_choice" %}
+          <form action="{{ url_for('submit_answer') }}" method="post" style="max-width: 600px; margin: 20px auto; padding: 0 12px; box-sizing: border-box;">
+		    <p style="font-weight: bold; text-align: center; margin: 0 0 8px; font-size: 1.05rem; color: #2c3e50;">
+			  Select the (best) answer
+		    </p>
+		    <div class="options-container">
+              {% for option in options %}
+                <label class="option-label">
+                  <input type="radio" name="user_answer" value="{{ option.letter }}" required>
+                  <span>{{ option.letter }}) {{ option.text }}</span>
+                </label>
+              {% endfor %}
+            </div>
+
+            <button type="submit" style="width: 100%; padding: 14px 16px; background-color: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1.1rem; min-height: 48px; box-sizing: border-box; margin-top: 16px;">Submit Answer</button>
+          </form>
+
+        <!-- YES/NO QUESTIONS -->
+        {% elif question_type == "yes_no" %}
+          <form action="{{ url_for('submit_answer') }}" method="post" style="max-width: 600px; margin: 20px auto; padding: 0 12px; box-sizing: border-box;">
+            <div class="yes-no-buttons">
+              <button type="submit" name="user_answer" value="YES" class="yes-no-btn" onclick="this.classList.add('selected')">✅ YES</button>
+              <button type="submit" name="user_answer" value="NO" class="yes-no-btn" onclick="this.classList.add('selected')">❌ NO</button>
+            </div>
+            <p class="hint-text" style="font-size: 1rem; color: #666; margin-top: 16px; font-style: italic; text-align: center;">Click YES or NO</p>
+          </form>
+
+        <!-- FALLBACK TEXT INPUT -->
+        {% else %}
+          <form action="{{ url_for('submit_answer') }}" method="post" class="answer-form" style="max-width: 600px; margin: 20px auto; padding: 0 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px;">
+            <input type="text" 
+                   id="user_answer" 
+                   name="user_answer" 
+                   placeholder="Enter your answer" 
+                   maxlength="70" 
+                   required
+                   style="width: 100%; padding: 12px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; min-height: 44px;">
+            <p class="hint-text" style="font-size: 1rem; color: #666; margin-top: 8px; font-style: italic; text-align: center;">Maximum of 70 characters.</p>
+            <p id="char-count" style="font-size: 0.8rem; color: #999; text-align: center; margin: 4px 0 16px 0;">0 / 70 characters used</p>
+            <button type="submit" style="width: 100%; padding: 14px 16px; background-color: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1.1rem; min-height: 48px; box-sizing: border-box;">Submit Answer</button>
+          </form>
+        {% endif %}
+
+        {% if feedback %}
+          <div class="answer-block" style="background-color: #f0f8ff; border: 2px solid #3498db; border-radius: 8px; padding: 16px; margin: 20px auto; max-width: 600px; text-align: left;">
+            <p style="margin: 0 0 8px 0; line-height: 1.5; color: #333;"><strong>✅ Correct Answer:</strong> {{ current_answer }}</p>
+            <p style="margin: 0 0 12px 0; line-height: 1.5; color: #333;">{{ feedback }}</p>
+            <a href="{{ url_for('learn_more',
+                     question=question,
+                     answer_letter=current_answer,
+                     answer_text=(options | selectattr('letter', 'equalto', current_answer) | first).text,
+                     next=url_for('game')) }}"
+                style="display: inline-block; padding: 8px 16px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                📚 Learn More
+            </a>
+		  </div>
+        {% endif %}
+
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-messages" style="background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 12px 16px; margin: 16px auto; max-width: 600px; text-align: center;">
+          {% for message in messages %}
+            <p style="margin: 0; font-weight: bold; color: #856404;">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <script>
+      function showTrivia() {
+        const bubble = document.getElementById('triviaBubble');
+        const content = document.getElementById('triviaContent');
+        fetch('/get_trivia?category={{ category }}')
+          .then(r => r.json())
+    .then(data => {
+        if (data.trivia && data.trivia.trim() !== "") {
+            content.textContent = data.trivia;
+            bubble.style.display = 'block';
+        } else {
+            // Hide the bubble if no trivia this turn
+            bubble.style.display = 'none';
+        }
+    })
+
+          .catch(err => {
+            console.log('Trivia fetch failed:', err);
+            content.textContent = '💡 Keep learning about home maintenance!';
+            bubble.style.display = 'block';
+          });
+      }
+
+      function closeTrivia() {
+        const bubble = document.getElementById('triviaBubble');
+        bubble.style.display = 'none';
+      }
+
+      document.getElementById('triviaBubble').addEventListener('click', function() {
+        closeTrivia();
+      });
+
+      document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => showTrivia(), 500);
+
+        // Character counter for text input (fallback only)
+        const input = document.getElementById('user_answer');
+        if (input) {
+          const counter = document.getElementById('char-count');
+          input.addEventListener('input', () => {
+            const length = input.value.length;
+            counter.textContent = `${length} / 70 characters used`;
+          });
+        }
+      });
+    </script>
+
+<style>
+.spin-hourglass {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+    margin-right: 6px;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.delay-note {
+    font-size: 0.7rem;
+    color: #e6b800; /* gold */
+    display: block;
+    margin-top: 2px;
+    line-height: 1.1;
+}
+</style>
+
+</body>
+</html>

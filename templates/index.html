@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div id="command-center-header" 
+     style="display: block !important; 
+            background-color: #f1f5f9 !important; 
+            padding: 20px 20px !important; 
+            margin-bottom: 20px !important; 
+            border-bottom: 2px solid #cbd5e1 !important; 
+            text-align: center !important;">
+    <h1 style="color: #1e293b !important; 
+               font-size: 1.8rem !important; 
+               font-weight: 800 !important; 
+               margin: 0 !important;">
+       WELCOME to the Artificial Intelligence-based <br> Home DIY FixIt Game
+    </h1>
+</div>
+
+<audio id="bgAudio" preload="auto">
+  <source src="{{ url_for('serve_sound', filename='diyintro.mp3') }}" type="audio/mpeg">
+</audio>
+
+<div class="welcome-section" style="text-align: center; margin-bottom: 20px;">
+    <img src="{{ url_for('static', filename='fixit_welcome.png') }}" 
+         alt="" 
+         style="display: block; margin: 10px auto; max-height: 250px; border-radius: 8px;">
+    
+    <div style="margin-bottom: 15px;">
+        <button id="playSound" 
+                style="font-size: 1rem; padding: 10px 20px; background-color: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer;">
+            🔊 Play Sound
+        </button>
+    </div>
+
+    <div style="max-width: 600px; margin: 0 auto;">
+        <button id="explainToggle" 
+                style="padding: 14px 16px; background-color: #e0e0e0; border-radius: 6px; cursor: pointer; font-weight: bold; color: blue; border: none; font-size: 1.1rem; width: 100%;">
+            📜 How to Play FixIt ▼
+        </button>
+
+        <div id="instruction-box" 
+             style="max-height: 0; overflow: hidden; opacity: 0; transition: all 0.4s ease; background-color: white; border-radius: 6px; text-align: left; margin-top: 10px;">
+            <div style="padding: 20px;">
+                <p><strong>Stop calling the handyman!</strong> FixIt is an AI-powered DIY game.</p>
+                <h4 style="color: #e67e22;">🎯 OBJECTIVE</h4>
+                <p>Reach the target score by answering home maintenance questions correctly.</p>
+                <h4 style="color: #3498db;">🎲 GAMEPLAY</h4>
+                <p>Select a category and your level. The AI generates a custom problem for you to solve.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 30px; padding-bottom: 50px;">
+    <a href="{{ url_for('fixit_setup') }}" 
+       style="display: inline-block; 
+              background-color: #38bdf8; 
+              color: white; 
+              padding: 20px 60px; 
+              font-size: 1.5rem; 
+              font-weight: 800; 
+              text-decoration: none; 
+              border-radius: 50px; 
+              box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+              transition: transform 0.2s;">
+       START GAME
+    </a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bgAudio = document.getElementById('bgAudio');
+    const playBtn = document.getElementById('playSound');
+    const toggleBtn = document.getElementById('explainToggle');
+    const infoBox = document.getElementById('instruction-box');
+
+    if (playBtn && bgAudio) {
+        playBtn.addEventListener('click', function() {
+            if (bgAudio.paused) {
+                bgAudio.play();
+                playBtn.textContent = '🔊 Stop Sound';
+            } else {
+                bgAudio.pause();
+                bgAudio.currentTime = 0;
+                playBtn.textContent = '🔊 Play Sound';
+            }
+        });
+    }
+
+    if (toggleBtn && infoBox) {
+        toggleBtn.addEventListener('click', function() {
+            if (infoBox.style.maxHeight === '0px' || infoBox.style.maxHeight === '') {
+                infoBox.style.maxHeight = '600px';
+                infoBox.style.opacity = '1';
+            } else {
+                infoBox.style.maxHeight = '0px';
+                infoBox.style.opacity = '0';
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}

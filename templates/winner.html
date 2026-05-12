@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Winner</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .end-buttons {
+      margin: 24px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 600px;
+      padding: 0 16px;
+    }
+    .end-buttons a {
+      display: block;
+      text-align: center;
+      padding: 12px 16px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.6rem !important;
+        margin: 16px 0 !important;
+        padding: 0 12px !important;
+      }
+      h2 {
+        font-size: 1.4rem !important;
+        margin: 16px 0 !important;
+      }
+      .compact-leaderboard {
+        padding: 0 8px !important;
+      }
+      .compact-leaderboard h3 {
+        font-size: 1.2rem !important;
+      }
+      .grid {
+        gap: 10px !important;
+      }
+      .team-score {
+        font-size: 1.1rem !important;
+        padding: 14px 12px !important;
+        min-width: auto !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .end-buttons {
+        max-width: 100% !important;
+        padding: 0 8px !important;
+        margin: 20px auto !important;
+      }
+      .end-buttons a {
+        font-size: 1.2rem !important;
+        padding: 14px 16px !important;
+        min-height: 48px !important;
+      }
+    }
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 1.4rem !important;
+      }
+      h2 {
+        font-size: 1.2rem !important;
+      }
+      .compact-leaderboard h3 {
+        font-size: 1.1rem !important;
+      }
+      .team-score {
+        font-size: 1rem !important;
+        padding: 12px 10px !important;
+      }
+      .end-buttons a {
+        font-size: 1.1rem !important;
+        padding: 12px 14px !important;
+      }
+    }
+    @media (max-width: 380px) {
+      h1 {
+        font-size: 1.2rem !important;
+      }
+      h2 {
+        font-size: 1.1rem !important;
+      }
+      .compact-leaderboard h3 {
+        font-size: 1rem !important;
+      }
+      .team-score {
+        font-size: 0.95rem !important;
+        padding: 10px 8px !important;
+      }
+      .end-buttons a {
+        font-size: 1rem !important;
+        padding: 10px 12px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<h1>🎉 {{ winner }} wins FixIt!</h1>
+<h2>🏆 Final Results</h2>
+<div class="compact-leaderboard">
+  <h3>Scoreboard</h3>
+  <div class="grid">
+    {% for team in teams %}
+      <div class="team-score {% if team.name == winner %}leader{% endif %}">
+        {% if team.name == winner %}🥇 {% endif %}
+        {{ team.name }} — Score: {{ '%.1f'|format(team_scores.get(team.name, 0)|float) }}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<audio id="teamAudio" autoplay preload="auto">
+  <source src="{{ url_for('serve_sound', filename='correct_answer.mp3') }}" type="audio/mpeg">
+</audio>
+
+<div class="end-buttons">
+  <a href="{{ url_for('index') }}" class="start-button">🔄 Play Again</a>
+  <a href="{{ url_for('goodbye') }}" class="end-button">🚪 Leave FixIt</a>
+</div>
+
+</body>
+</html>

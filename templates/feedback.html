@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FixIt Feedback</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+@keyframes popIn {
+0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@media (max-width: 600px) {
+.feedback-card { margin-left: 8px !important; margin-right: 8px !important; }
+.feedback-card p { font-size: 1rem !important; }
+.team-header { font-size: 1.3rem !important; }
+.next-and-board { flex-direction: column !important; }
+.compact-leaderboard { width: 100% !important; }
+.compact-leaderboard h3 { font-size: 1.1rem !important; }
+.team-score { font-size: 1rem !important; }
+}
+@media (max-width: 500px) {
+.feedback-card { padding: 12px 14px !important; margin-bottom: 16px !important; }
+.feedback-card p { font-size: 1.1rem !important; line-height: 1.5 !important; }
+.team-header { font-size: 1.4rem !important; }
+.keywords { gap: 10px !important; }
+.chip { font-size: 1rem !important; padding: 6px 10px !important; }
+.next-and-board { gap: 12px !important; }
+.next-turn-btn { font-size: 1.1rem !important; padding: 12px !important; min-height: 48px !important; width: 100% !important; box-sizing: border-box !important; }
+.compact-leaderboard h3 { font-size: 1.2rem !important; margin-bottom: 10px !important; }
+.team-score { font-size: 1.1rem !important; padding: 8px 12px !important; min-width: auto !important; }
+.round-points { font-size: 1.2rem !important; }
+.learn-more a { font-size: 1.1rem !important; }
+}
+@media (max-width: 380px) {
+.feedback-card { padding: 10px 12px !important; }
+.feedback-card p { font-size: 1rem !important; }
+.team-header { font-size: 1.2rem !important; }
+.chip { font-size: 0.95rem !important; padding: 4px 8px !important; }
+.next-turn-btn { font-size: 1rem !important; padding: 10px !important; min-height: 44px !important; }
+.compact-leaderboard h3 { font-size: 1.1rem !important; }
+.team-score { font-size: 1rem !important; }
+}
+</style>
+</head>
+<body>
+<div id="triviaBubble" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; cursor: pointer;">
+<div style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 20px 24px; border-radius: 16px; max-width: 400px; width: 85vw; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); position: relative; animation: popIn 0.4s ease;">
+<div style="position: absolute; bottom: -12px; left: 30px; width: 0; height: 0; border-left: 12px solid transparent; border-right: 0 solid transparent; border-top: 12px solid #2980b9;"></div>
+<span style="position: absolute; top: 8px; right: 12px; font-size: 1.2rem; opacity: 0.7;">✕</span>
+<p id="triviaContent" style="margin: 0; font-size: 1.05rem; line-height: 1.6; font-weight: 500; text-align: center; padding-right: 20px;">Loading trivia...</p>
+<p style="margin: 8px 0 0 0; font-size: 0.85rem; text-align: center; opacity: 0.8; font-style: italic;">(Click to close)</p>
+</div>
+</div>
+<audio id="pointsAudio" preload="auto">
+<source src="{{ url_for('serve_sound', filename='match.wav') }}" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio>
+<audio id="nopointsAudio" preload="auto">
+<source src="{{ url_for('serve_sound', filename='no-match.wav') }}" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio>
+<div class="container">
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flash-messages">
+{% for category, message in messages %}
+<p class="{{ category }}">{{ message }}</p>
+{% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+<div class="feedback-card">
+<h2 class="team-header" style="margin: 0 0 12px 0; font-size: 1.4rem; color: #e67e22; text-align: center;">Team: {{ team }}</h2>
+<p style="margin: 0 0 8px 0; font-size: 0.95rem;"><span class="label">📝 Question:</span> {{ question }}</p>
+{% if question_type == "multiple_choice" and options %}
+<div style="margin: 0 0 12px 0; padding: 10px; background-color: #f0f8ff; border-left: 4px solid #3498db; border-radius: 4px;">
+<p style="margin: 0 0 8px 0; font-size: 0.95rem; font-weight: bold;">📋 Options:</p>
+<ul style="margin: 0; padding-left: 20px;">
+{% for option in options %}
+<li style="font-size: 0.95rem; margin: 4px 0;">{{ option.letter }}) {{ option.text }}</li>
+{% endfor %}
+</ul>
+</div>
+{% endif %}
+<p style="margin: 0 0 8px 0; font-size: 0.95rem;"><span class="label">👤 Your Answer:</span> {{ user_answer }}</p>
+<p style="margin: 0 0 8px 0; font-size: 0.95rem;">✅ <span class="label">Correct Answer:</span> {{ correct_answer }}</p>
+<p class="learn-more" style="display: block; margin-bottom: 12px;">
+{% if question_type == "yes_no" %}
+    <a href="{{ url_for('learn_more',
+                         question=question,
+                         answer_letter=correct_answer,
+                         answer_text=correct_answer,
+                         next=url_for('game')) }}"
+       style="color: #3498db; text-decoration: none; font-weight: bold;">
+        📚 Learn more about this question
+    </a>
+{% else %}
+    <a href="{{ url_for('learn_more',
+                         question=question,
+                         answer_letter=correct_answer,
+                         answer_text=(options | selectattr('letter', 'equalto', correct_answer) | first).text,
+                         next=url_for('game')) }}"
+       style="color: #3498db; text-decoration: none; font-weight: bold;">
+        📚 Learn more about this question
+    </a>
+{% endif %}
+</p>
+
+{% if is_correct %}
+<div class="keywords" style="background-color: #d4edda; border: 2px solid #28a745; border-radius: 6px; padding: 12px; margin-bottom: 12px;">
+<div style="font-weight: bold; color: #155724; text-align: center; font-size: 1.2rem;">✅ CORRECT!</div>
+</div>
+{% else %}
+<div class="keywords" style="background-color: #f8d7da; border: 2px solid #dc3545; border-radius: 6px; padding: 12px; margin-bottom: 12px;">
+<div style="font-weight: bold; color: #721c24; text-align: center; font-size: 1.2rem;">❌ INCORRECT</div>
+</div>
+{% endif %}
+<div class="score-bar" style="margin: 12px 0; background: #eee; border-radius: 6px; height: 16px; overflow: hidden;">
+<div class="score-fill" style="background: {% if is_correct %}#4CAF50{% else %}#dc3545{% endif %}; height: 100%; width: {% if is_correct %}100%{% else %}0%{% endif %};"></div>
+</div>
+<p class="round-points" style="text-align: center; font-weight: bold; font-size: 1.1rem; color: #e67e22; margin: 12px 0;">🎯 Points this round: {{ points_awarded }}</p>
+<div class="next-and-board" style="display: flex; gap: 12px; margin-top: 20px;">
+<form method="post" action="{{ url_for('next_turn') }}" style="flex: 1;">
+
+<button type="submit" class="button next-turn-btn"
+        style="background-color: #3498db; color: white; padding: 14px 16px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1.1rem; min-height: 48px; box-sizing: border-box; width: 100%; text-align:center;">
+    
+    <span class="spin-hourglass" style="color:#e6b800;">⏳</span>
+    NEXT TURN
+    <span class="delay-note">expect a few‑second delay</span>
+
+</button>
+
+</form>
+<div class="leaderboard compact-leaderboard" style="flex: 1; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; padding: 12px; text-align: center;">
+<h3 style="margin: 0 0 12px 0; font-size: 1.2rem; color: #2c3e50;">📊 Leaderboard</h3>
+<div class="grid" style="display: flex; flex-direction: column; gap: 8px;">
+{% for team_name, score in leaderboard.items() %}
+<div class="team-score" style="padding: 10px; background-color: {% if team_name == leading_team %}#fff3cd{% else %}white{% endif %}; border: 1px solid #ddd; border-radius: 4px; font-weight: {% if team_name == leading_team %}bold{% else %}normal{% endif %}; color: {% if team_name == leading_team %}#856404{% else %}#333{% endif %};">
+<span style="font-size: 0.95rem;">{{ team_name }}: <strong style="color: #e67e22;">{{ "%.0f"|format(score) }}</strong></span>
+</div>
+{% endfor %}
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+const isCorrect = {{ 'true' if is_correct else 'false' }};
+const pointsAudio = document.getElementById('pointsAudio');
+const nopointsAudio = document.getElementById('nopointsAudio');
+pointsAudio.currentTime = 0;
+nopointsAudio.currentTime = 0;
+if (isCorrect) {
+console.log('Playing points audio - correct answer');
+pointsAudio.play().catch(error => console.log('Points audio error:', error));
+} else {
+console.log('Playing nopoints audio - incorrect answer');
+nopointsAudio.play().catch(error => console.log('Nopoints audio error:', error));
+}
+const triviaChance = 0.5;
+const teamCategory = "{{ current_category }}";
+if (Math.random() < triviaChance && teamCategory) {
+const triviaTimeout = setTimeout(() => {
+console.log('Trivia fetch timed out');
+}, 3000);
+try {
+fetch(`/get_trivia?category=${encodeURIComponent(teamCategory)}`, {
+signal: AbortSignal.timeout(3000)
+})
+.then(response => response.json())
+.then(data => {
+clearTimeout(triviaTimeout);
+if (data.trivia) {
+document.getElementById('triviaContent').textContent = data.trivia;
+document.getElementById('triviaBubble').style.display = 'block';
+console.log('Trivia displayed:', data.trivia);
+}
+})
+.catch(error => {
+clearTimeout(triviaTimeout);
+console.log('Trivia error:', error);
+});
+} catch (e) {
+clearTimeout(triviaTimeout);
+console.log('Trivia exception:', e);
+}
+}
+document.getElementById('triviaBubble').addEventListener('click', function() {
+this.style.display = 'none';
+});
+});
+</script>
+
+<style>
+.spin-hourglass {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+    margin-right: 6px;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.delay-note {
+    font-size: 0.7rem;
+    color: #e6b800; /* gold */
+    display: block;
+    margin-top: 2px;
+    line-height: 1.1;
+}
+</style>
+
+</body>
+</html>
