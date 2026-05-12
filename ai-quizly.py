@@ -589,15 +589,13 @@ def get_openai_question_answer(prompt: str, question_type: str = "multiple_choic
     client = OpenAI(api_key=api_key, timeout=10.0)
 
     try:
-<<<<<<< HEAD
         print(f"DEBUG: Calling OpenAI (Model: gpt-4o-mini, Temp: {temperature})")
         response = client.chat.completions.create(
             model="gpt-4o-mini",
-=======
+
         print(f"DEBUG: Calling OpenAI (Model: gpt-3.5-turbo, Temp: {temperature})")
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
->>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
+            model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=500,
             temperature=temperature,
@@ -684,7 +682,7 @@ def generate_question(category, difficulty, subtopic=None, subsubtopic=None, sou
         question_type = "multiple_choice"
 
     # 3. Build Prompt
-<<<<<<< HEAD
+
     # Inside generate_question()
     base_prompt = f"""
     Generate ONE clear, practical home-repair question about {category}, focused on the subtopic "{subtopic}" and detail "{subsubtopic}".
@@ -705,27 +703,6 @@ QUALITY REQUIREMENTS:
 - The correct answer must be the technically superior choice.
 - Distractors (wrong answers) should include common but less effective DIY 'band-aid' fixes."""
     base_prompt += "\nMULTIPLE-CHOICE FORMAT:\nQuestion: [question]\nA) [opt]\nB) [opt]\nC) [opt]\nD) [opt]\nCorrect Answer: [A/B/C/D]"
-=======
-    base_prompt = f"""
-Generate ONE clear, practical home-repair question about {category}, 
-focused on the subtopic "{subtopic}" and detail "{subsubtopic}".
-GENERAL REQUIREMENTS:
-- Use natural homeowner-friendly language. Specific and realistic.
-- Do NOT include explanations, reasoning, or extra commentary.
-"""
-
-    if question_type == "yes_no":
-        base_prompt += "\nFormat:\nQuestion: [question]\nCorrect Answer: YES or NO"
-    else:
-        if difficulty == "experienced":
-            base_prompt += """
-EXPERIENCED REQUIREMENTS:
-- Require multi-step reasoning/diagnosis.
-- Include a scenario with specific symptoms or constraints.
-- Correct answer should not be obvious; rule out simple safety steps.
-"""
-        base_prompt += "\nMULTIPLE-CHOICE FORMAT:\nQuestion: [question]\nA) [opt]\nB) [opt]\nC) [opt]\nD) [opt]\nCorrect Answer: [A/B/C/D]"
->>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
 
     # 4. Generation Loop
     attempts = 0
@@ -783,11 +760,7 @@ def get_openai_expanded_answer(question: str, correct_answer: str = None) -> dic
             answer_context = f"\\n\\nThe correct answer to this question is: {correct_answer}\\n\\nPlease explain why this answer is correct."
         
         response = client.chat.completions.create(
-<<<<<<< HEAD
             model="gpt-4o-mini",
-=======
-            model="gpt-3.5-turbo",
->>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
             messages=[{"role": "user", "content": f"Provide a brief explanation for: {question}{answer_context} Keep it to 5-6 sentences max (~625 characters)."}],
             max_tokens=400,
             temperature=0.7
@@ -867,11 +840,7 @@ REQUIREMENTS:
         client = OpenAI(api_key=get_openai_api_key(), timeout=6.0)
 
         response = client.chat.completions.create(
-<<<<<<< HEAD
             model="gpt-4o-mini",
-=======
-            model="gpt-3.5-turbo",
->>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
             messages=[{"role": "user", "content": prompt}],
             max_tokens=180,
             temperature=0.4
@@ -917,18 +886,13 @@ def fixit_intro():
 # 3. THE FIXIT GAME LOGIC (The Team Setup)
 @app.route("/fixit", methods=["GET", "POST"])
 def fixit_setup():
-<<<<<<< HEAD
     # If the user is just arriving (GET)
-=======
-    # If the user is just arriving from the Hub (GET)
->>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
     if request.method == "GET":
         num_teams = request.args.get('num_teams', 1, type=int)
         return render_template("team_setup.html", 
                                num_teams=num_teams, 
                                categories=get_all_categories())
 
-<<<<<<< HEAD
     # --- THE SUBMISSION LOGIC (POST) ---
     # 1. Clear old session data
     session.clear()
@@ -956,14 +920,6 @@ def fixit_setup():
 
     # 4. GO DIRECTLY TO THE GAME (No more redirecting back to setup!)
     return redirect(url_for("game"))
-=======
-    # If the user is submitting the form (POST)
-    session.clear()
-    num_teams = int(request.form.get("num_teams", 1))
-    session["num_teams"] = num_teams
-    session["team_names"] = [""] * num_teams
-    return redirect(url_for("team_setup"))
->>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
 
 # 4. THE MUSIC RECALL GAME
 @app.route('/music_recall')
@@ -1328,13 +1284,8 @@ def get_trivia():
 
     # --- Decide once per turn whether trivia should appear ---
     if "show_trivia" not in session:
-<<<<<<< HEAD
         # Adjust probability here (0.45 = 45% chance)
         session["show_trivia"] = (random.random() < 0.4)
-=======
-        # Adjust probability here (0.35 = 35% chance)
-        session["show_trivia"] = (random.random() < 0.35)
->>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
 
     # If trivia is disabled for this turn, return None immediately
     if not session["show_trivia"]:
@@ -1364,11 +1315,8 @@ def get_trivia():
         category_focus = category_descriptions.get(category, category_descriptions["general"])
 
         response = client.chat.completions.create(
-<<<<<<< HEAD
             model="gpt-4o-mini",
-=======
-            model="gpt-3.5-turbo",
->>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
+
             messages=[{
                 "role": "user",
                 "content": (
@@ -1459,11 +1407,8 @@ def generate_music_challenge(genre):
         # --- TEMPERATURE INCREASED TO 0.9 ---
         # 0.4 makes it repetitive; 0.9 forces it to be more creative and random.
         response = client.chat.completions.create(
-<<<<<<< HEAD
+
             model="gpt-4o-mini",
-=======
-            model="gpt-3.5-turbo",
->>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
             messages=[{"role": "user", "content": prompt}],
             temperature=0.9  
         )
@@ -1538,8 +1483,6 @@ if __name__ == "__main__":
         
     app.run(
         host="0.0.0.0", port=5000, 
-<<<<<<< HEAD
+
         debug=False, use_reloader=False)
-=======
-        debug=False, use_reloader=False)
->>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
+
