@@ -108,17 +108,27 @@
 </div>
 
 <!-- TEAM COUNT BOX (styled like Points Needed box) -->
+<<<<<<< HEAD
 <form method="post">
+=======
+>>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
 <div style="background-color: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px 16px; margin: 16px auto; max-width: 600px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); text-align:center;">
   <label for="num-teams" style="display:block; font-weight:bold; margin-bottom:6px; font-size:0.95rem;">
     Number of Players or Teams (1–4)
   </label>
   <input type="number" id="num-teams" name="num_teams" min="1" max="4"
          value="{{ num_teams }}"
+<<<<<<< HEAD
 		 autocomplete="off"
          style="width:60px; text-align:center; font-size:1rem; padding:6px 10px; border:1px solid #ccc; border-radius:4px;">
 </div>
 
+=======
+         style="width:60px; text-align:center; font-size:1rem; padding:6px 10px; border:1px solid #ccc; border-radius:4px;">
+</div>
+
+<form method="post">
+>>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
 
   <!-- POINTS NEEDED BOX -->
   <div style="background-color: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px 16px; margin: 16px auto; max-width: 600px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
@@ -177,12 +187,17 @@
     </button>
 </div>
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
 </form>
 
 <!-- JS: Reload immediately when team count changes -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const teamInput = document.getElementById('num-teams');
+<<<<<<< HEAD
   const setupForm = document.querySelector('form');
   
   // Track the exact value the page loaded with
@@ -206,6 +221,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // 3. If it's a valid, different number, refresh the setup blocks
     if (newValue >= 1 && newValue <= 4) {
       window.location.href = "{{ url_for('team_setup') }}?num_teams=" + newValue;
+=======
+
+  teamInput.addEventListener('input', function() {
+    const num = parseInt(teamInput.value, 10);
+    if (num >= 1 && num <= 4) {
+      window.location.href = "{{ url_for('team_setup') }}?num_teams=" + num;
+>>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
     }
   });
 });

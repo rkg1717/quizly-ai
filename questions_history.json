@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "asked_questions": [
     {
@@ -357,4 +358,87 @@
       "fuses|tripped"
     ]
   }
+=======
+{
+  "asked_questions": [
+    {
+      "question": "How can I determine if my existing lawn needs to be reseeded or if it can be rejuvenated with fertilizer and aeration?",
+      "category": "yard",
+      "subtopic": "lawn",
+      "subsubtopic": "new and existing",
+      "difficulty": "experienced",
+      "timestamp": "2026-05-03T11:29:35.562775"
+    },
+    {
+      "question": "How can I effectively deter moles and voles from damaging my lawn without harming other wildlife?",
+      "category": "yard",
+      "subtopic": "lawn",
+      "subsubtopic": "moles and voles",
+      "difficulty": "experienced",
+      "timestamp": "2026-05-03T11:29:54.121113"
+    },
+    {
+      "question": "My new shrubs are looking wilted and have yellowing leaves. What could be causing this issue?",
+      "category": "yard",
+      "subtopic": "shrubs",
+      "subsubtopic": "new",
+      "difficulty": "experienced",
+      "timestamp": "2026-05-03T11:29:58.123245"
+    },
+    {
+      "question": "How can I determine if my existing shrubs are suffering from root rot?",
+      "category": "yard",
+      "subtopic": "shrubs",
+      "subsubtopic": "existing",
+      "difficulty": "experienced",
+      "timestamp": "2026-05-03T11:30:15.682391"
+    },
+    {
+      "question": "My shrubs are looking sparse and yellow, despite regular watering. What should I consider when fertilizing them?",
+      "category": "yard",
+      "subtopic": "shrubs",
+      "subsubtopic": "fertilizing",
+      "difficulty": "experienced",
+      "timestamp": "2026-05-03T11:30:17.396437"
+    },
+    {
+      "question": "My fruit tree's leaves are turning yellow and dropping prematurely. What could be the cause?",
+      "category": "yard",
+      "subtopic": "trees",
+      "subsubtopic": "fruit",
+      "difficulty": "experienced",
+      "timestamp": "2026-05-03T11:31:01.713889"
+    },
+    {
+      "question": "My dishwasher is not draining properly and there is standing water at the bottom after each cycle. What could be causing this issue?",
+      "category": "appliances",
+      "subtopic": "dishwasher",
+      "subsubtopic": "issues",
+      "difficulty": "experienced",
+      "timestamp": "2026-05-03T14:03:12.184473"
+    },
+    {
+      "question": "My dishwasher is not draining properly and water is pooling at the bottom after each cycle. What should I check first to address this issue?",
+      "category": "appliances",
+      "subtopic": "dishwasher",
+      "subsubtopic": "care",
+      "difficulty": "experienced",
+      "timestamp": "2026-05-03T14:03:31.334539"
+    }
+  ],
+  "used_subtopics": {
+    "yard": [
+      "lawn|new and existing",
+      "lawn|moles and voles",
+      "shrubs|new",
+      "shrubs|existing",
+      "shrubs|fertilizing",
+      "trees|fruit"
+    ],
+    "appliances": [
+      "dishwasher|issues",
+      "dishwasher|care"
+    ]
+  }
+>>>>>>> 7a1bdb191cb48002f716916db9c9a0017974da64
 }
