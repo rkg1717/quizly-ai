@@ -589,18 +589,18 @@ def get_openai_question_answer(prompt: str, question_type: str = "multiple_choic
     client = OpenAI(api_key=api_key, timeout=10.0)
 
     try:
-        print(f"DEBUG: Calling OpenAI (Model: gpt-4o-mini, Temp: {temperature})")
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-
-        print(f"DEBUG: Calling OpenAI (Model: gpt-3.5-turbo, Temp: {temperature})")
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=500,
-            temperature=temperature,
-            top_p=0.9
-        )
+            print(f"DEBUG: Calling OpenAI (Model: gpt-4o-mini, Temp: {temperature})")
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "system", "content": "You are a home repair expert."},
+                          {"role": "user", "content": prompt}],
+                max_tokens=500,
+                temperature=temperature,
+                top_p=0.9
+            )
+    except Exception as e:
+        print(f"ERROR: OpenAI call failed: {e}")
+        response = None
 
         text = response.choices[0].message.content.strip()
         print(f"\n--- AI RAW RESPONSE ---\n{text}\n-----------------------")
