@@ -575,7 +575,7 @@ def check_answer(user_answer, correct_answer, question_type):
     else:
         return (False, 0)
 
-def get_openai_question_answer(prompt: str, question_type: str = "multiple_choice", temperature: float = 0.8) -> dict:
+def get_openai_question_answer(prompt: str, question_type: str = "multiple_choice", temperature: float = 0.7) -> dict:
     """
     Unified OpenAI caller. 
     Supports dynamic temperature for variety and robust multi-format parsing.
@@ -586,7 +586,7 @@ def get_openai_question_answer(prompt: str, question_type: str = "multiple_choic
         return None
 
     # Use a slightly longer timeout for complex 'experienced' scenarios
-    client = OpenAI(api_key=api_key, timeout=10.0)
+    client = OpenAI(api_key=api_key, timeout=12.0)
 
     try:
             print(f"DEBUG: Calling OpenAI (Model: gpt-4o-mini, Temp: {temperature})")
@@ -1348,32 +1348,42 @@ def goodbye():
 # --- ---------------------------------------------------------------
 @app.route('/get_music_turn', methods=['POST'])
 def get_music_turn():
-    # Use request.get_json() to handle the incoming JavaScript data
-    data = request.get_json()
+    data = request.json
     genre = data.get('genre', 'Country')
+    decade = data.get('decade', 'Random')
 
-    # Initialize history in the session if it doesn't exist
     if 'history' not in session:
         session['history'] = []
+    
+    # Calculate Dynamic Temperature
+    # Turn 0 (0.4) -> Turn 1 (0.525) -> Turn 2 (0.65) -> Turn 3 (0.775) -> Turn 4+ (0.9)
+    current_turn = len(session['history'])
+    start_temp = 0.4
+    end_temp = 0.9
+    ramp_up_turns = 4
+    
+    if current_turn >= ramp_up_turns:
+        dynamic_temp = end_temp
+    else:
+        # Linear interpolation
+        dynamic_temp = start_temp + ((end_temp - start_temp) / ramp_up_turns) * current_turn
 
-    # Try up to 3 times to get a unique song
     for _ in range(3):
-        song_data = generate_music_challenge(genre)
+        # Pass the calculated temperature to the generator
+        song_data = generate_music_challenge(genre, dynamic_temp)
         song_title = song_data.get('Song', '').strip().lower()
 
-        # Only return the song if it's NOT in our recent history
         if song_title not in session['history']:
             history = session['history']
             history.append(song_title)
-            session['history'] = history[-10:] # Keep the last 10 songs
+            session['history'] = history[-10:]
             session.modified = True
             return jsonify(song_data)
 
-    # If it still repeats after 3 tries, return it anyway to avoid an infinite loop
     return jsonify(song_data)
   
 # --- MUSIC RECALL ENGINE ---
-def generate_music_challenge(genre):
+def generate_music_challenge(genre, temp=0.7):
     api_key = get_openai_api_key()
     if not api_key:
         return {"Beat": "API Key Missing", "Lowdown": "Check your configuration."}
@@ -1391,9 +1401,9 @@ def generate_music_challenge(genre):
     SPECIAL INSTRUCTIONS FOR GENRES:
     - If {genre} is Classical: 'Lyric' should be a description of a famous melody or a movement nickname.
     - If {genre} is Jazz: 'Lyric' can be a description of a famous solo or vocal line.
-    - If {genre} is Latin: Focus on the specific dance rhythm (e.g.,Cha Cha, Songo, Montuno).
+    - If {genre} is Latin: Focus on the specific dance rhythm (e.g., Cha Cha, Songo, Montuno).
 
-    IMPORTANT: All fields (Beat, Lowdown, Lyric, Song, Artist) MUST refer to the SAME single work.
+    IMPORTANT: All fields (Beat, Lowdown, Lyric, Song, Artist, Year) MUST refer to the SAME single work.
     
     FORMAT EXACTLY:
     Beat: [Technical rhythmic description]
@@ -1403,32 +1413,31 @@ def generate_music_challenge(genre):
     Artist: [Composer or Artist]
     Year: [Year]
     """
+    
     try:
-        # --- TEMPERATURE INCREASED TO 0.9 ---
-        # 0.4 makes it repetitive; 0.9 forces it to be more creative and random.
         response = client.chat.completions.create(
-
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.9  
+            temperature=temp 
         )
+        
         text = response.choices[0].message.content.strip()
         
-        # Robust Parsing using Regular Expressions
+# --- ROBUST PARSING LOGIC ---
         data = {}
-        patterns = {
-            "Beat": r"Beat:\s*(.*)",
-            "Lowdown": r"Lowdown:\s*(.*)",
-            "Lyric": r"Lyric:\s*(.*)",
-            "Song": r"Song:\s*(.*)",
-            "Artist": r"Artist:\s*(.*)",
-            "Year": r"Year:\s*(.*)"
-        }
+        fields = ["Beat", "Lowdown", "Lyric", "Song", "Artist", "Year"]
         
-        for key, pattern in patterns.items():
-            match = re.search(pattern, text, re.IGNORECASE)
-            data[key] = match.group(1).strip() if match else f"No {key} found."
-            
+        for field in fields:
+                    pattern = rf"^{field}\s*[:\-*]*\s*(.*)"
+                    match = re.search(pattern, text, re.IGNORECASE | re.MULTILINE)
+                    
+                    if match:
+                        # Add .replace('"', '') to strip out those quotes
+                        clean_value = match.group(1).replace("**", "").replace('"', '').strip()
+                        data[field] = clean_value
+                    else:
+                        data[field] = f"Unknown {field}"
+
         return data
 
     except Exception as e:
@@ -1437,33 +1446,23 @@ def generate_music_challenge(genre):
 
 @app.route('/get_audio_clue/<song_name>/<artist_name>')
 def get_audio_clue(song_name, artist_name):
-    # 1. Prepare the search for iTunes
     search_url = "https://itunes.apple.com/search"
     query = f"{song_name} {artist_name}"
-    
-    params = {
-        "term": query,
-        "limit": 1,        # We only want the best match
-        "media": "music"
-    }
+    params = {"term": query, "limit": 1, "media": "music"}
     
     try:
-        # 2. Ask iTunes for the song data
         response = requests.get(search_url, params=params)
         data = response.json()
         
         if data.get("resultCount", 0) > 0:
-            # 3. Get the 30-second preview URL from the first result
             preview_url = data["results"][0]["previewUrl"]
-            
-            # 4. Redirect the browser to play this audio stream
-            return redirect(preview_url)
+            # CHANGE THIS: Return JSON instead of a redirect
+            return jsonify({"url": preview_url})
         else:
-            return "Audio snippet not found for this track.", 404
+            return jsonify({"error": "Not found"}), 404
             
     except Exception as e:
-        print(f"Connection Error: {e}")
-        return "Internal Server Error", 500
+        return jsonify({"error": str(e)}), 500
     
 @app.route("/music_recall")
 def music_recall_route():
